@@ -4,7 +4,7 @@
 
 // Include application, user and local libraries
 #include "DotDisplay.h"
-
+/*
 //--------------------------------------
 const char str_00[] PROGMEM  = "[R] P E";   // "String 0" etc are strings to store - change to suit.
 const char str_01[] PROGMEM  = "R [P] E";
@@ -23,7 +23,7 @@ const char str_11[] PROGMEM  = "Ready";      // boot
 
 const char str_12[] PROGMEM  = "Ready";      // signal check
 const char str_13[] PROGMEM  = "Signal?";    // signal check
-
+*/
 
 //
 //PROGMEM const char * SysTexts[] =
