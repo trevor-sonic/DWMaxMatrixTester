@@ -11,6 +11,7 @@
  */
 #include "DotDisplay.h"
 #include "CharDefinitions.h"
+#include "Texts.h"
 #include "DWEasyInterval.h"
 
 
@@ -29,7 +30,7 @@ DWEasyInterval interval;
 void setup()
 {
   Serial.begin(9600);
-  Serial.print('Start.');
+  Serial.println('Start.');
 
 
 
@@ -38,11 +39,11 @@ void setup()
 
 
   m.setupDisplay          (CharSet);
-  m.printShift("abc!.123", 90);
-
-interval.setFunction(refresh);
-interval.setDelay(500,0);
-interval.start();
+  m.stringShift("This is test text! 0123456789ABCDEF", 50, printEnd);
+  
+  interval.setFunction(changeDelay);
+  interval.setDelay(10, 0);
+  interval.start();
 
 }
 
@@ -51,8 +52,12 @@ void loop()
   m.engine();
   interval.loop();
 }
-void refresh()
+void changeDelay()
 {
-  Serial.println(millis(), DEC); 
+  //m.setDelay( 100 * (30 / m.getCharIndex() ) );
 }
-
+void printEnd()
+{
+  Serial.println("-> printEnd");
+  m.textShift(TEXT02, 50, printEnd);
+}

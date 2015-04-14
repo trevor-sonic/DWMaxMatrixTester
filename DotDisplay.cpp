@@ -1,6 +1,9 @@
 // Library header
 #include "DotDisplay.h"
 
+#define writeModeString  0
+#define writeModeText    1
+
 // Code
 DotDisplay::DotDisplay(byte load, byte clock, byte data, byte num, byte * colBuffer) : DWMaxMatrix(load,  clock, data,  num, colBuffer)
 
@@ -11,6 +14,7 @@ DotDisplay::DotDisplay(byte load, byte clock, byte data, byte num, byte * colBuf
   _delay		=	100;
   _lastMillis	=	millis();
   _running	=	false;
+  _currWriteMode=    writeModeString;
 
 }
 void DotDisplay::setupDisplay( const char *charSet)
@@ -18,7 +22,7 @@ void DotDisplay::setupDisplay( const char *charSet)
   init                    ();         // module initialize
   setIntensity            (0);        // dot matix intensity 0-15
   _CharSet            =   charSet;
-  
+
 }
 void DotDisplay::engine()
 {
@@ -27,36 +31,56 @@ void DotDisplay::engine()
   {
     _lastMillis	=	millis();
     slideLeft();
-    digitalWrite(3,HIGH);
-  }
-  else
-  {
-  digitalWrite(3,LOW);
-  return;
   }
 
-  
 }
-void DotDisplay::printShift  (char * s, uint8_t delayMs)
+void DotDisplay::startShift()
 {
-  _currString     =  s;
   _currCharIndex  =  0;
-
-  _delay       =  delayMs;
   _running     =  true;
   _lastMillis  =  millis();
 
-  getChar();
+  getChar();  
+}
+void DotDisplay::textShift (const char *txt, uint8_t delayMs, functionPointer theFunction)
+{
+  _currWriteMode  =  writeModeText;
+  _currText       =  txt;
+  
+  _callBackFunction=theFunction;
+  _delay       =  delayMs;
+  
+  startShift();  
+}
+void DotDisplay::stringShift  (char * s, uint8_t delayMs, functionPointer theFunction)
+{
+  _currWriteMode  =  writeModeString;
+  _currString     =  s;
+  
+  _callBackFunction=theFunction;
+  _delay       =  delayMs;
+  
+  startShift();
 }
 void DotDisplay::getChar()
 {
-  _currChar       =  *_currString;
-  if (_currChar != 0)
-  {}
-  else
+
+  if(_currWriteMode  ==  writeModeString)
   {
+    _currChar       =  *_currString;
+  }
+  else if(_currWriteMode  ==  writeModeText)
+  {
+    _currChar       =  pgm_read_byte_near(_currText + _currCharIndex);;
+  }
+    Serial.print(_currCharIndex, DEC);
+    Serial.print(":");
+    Serial.println(_currChar);
+  if (_currChar == 0)
+  {
+    //Serial.println("*END*");
     _running = false;
-    return;
+    if(_callBackFunction)_callBackFunction();
   }
   if (_currChar < 32) return;
 
@@ -99,4 +123,12 @@ void DotDisplay::printString(char *s)
     col += buffer[0] + 1;
     s++;
   }
+}
+void DotDisplay::setDelay (uint8_t delayMs)
+{
+  _delay  =  delayMs;
+}
+uint8_t DotDisplay::getCharIndex()
+{
+  return _currCharIndex;
 }
