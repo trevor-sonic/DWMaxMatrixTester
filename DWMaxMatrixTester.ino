@@ -39,7 +39,7 @@ void setup()
 
 
   m.setupDisplay          (CharSet);
-  m.stringShift("This is test text! 0123456789ABCDEF", 50, printEnd);
+  m.stringShift("This is test text! 0123456789ABCDEF ", 50, printEnd);
   
   interval.setFunction(changeDelay);
   interval.setDelay(10, 0);
