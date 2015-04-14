@@ -1,9 +1,3 @@
-#include "Arduino.h"
-
-
-
-// Include application, user and local libraries
-#include "DotDisplay.h"
 /*
 //--------------------------------------
 const char str_00[] PROGMEM  = "[R] P E";   // "String 0" etc are strings to store - change to suit.

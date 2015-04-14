@@ -7,7 +7,7 @@
 #ifndef DotDisplay_h
 #define DotDisplay_h
 #include "DWMaxMatrix.h"
-#include <avr/pgmspace.h>
+//#include <avr/pgmspace.h>
 
 //Cfgs
 #define chBufferSize            8
@@ -31,11 +31,11 @@ public:
 	void setCharSet             (const char *cs);
 	void printString            (char *s);
         
-        void printShift             (char * s, int shift_speed);
+        void printShift             (char * s, uint8_t shift_speed);
         
-	void printStringWithShift   (char * s, int shift_speed);
-	void printStringWithShift2  (String s, int shift_speed);
-	void printCharWithShift     (char c, int shift_speed);
+	void printStringWithShift   (char * s, uint8_t shift_speed);
+	void printStringWithShift2  (String s, uint8_t shift_speed);
+	void printCharWithShift     (char c, uint8_t shift_speed);
 	void moveLeft               (uint8_t move);
 	void moveRight              (uint8_t move);
 	void moveUp                 (uint8_t move);
@@ -49,16 +49,17 @@ public:
 	void systemTextWithShift2   (uint8_t txtID, String s, uint8_t speed);
 
 	void (*_systemTextHandler)  (uint8_t txtID, char *);
-
+        void               slideLeft();
 private:
         byte              _colIndex;
         byte             _colQty;
         char             _currChar;
+        byte             _currCharIndex;
         char             _lastChar;
         char              * _currString;
         void             charShift(char  c);
-        void               moveLeft();
 
+        void             getChar();
 
 
 	byte                buffer[8];// 1 char is 8 bytes.
@@ -72,7 +73,7 @@ private:
 	bool			_currStatus;
 
 	unsigned long 	_lastMillis;
-	unsigned long  	_delay;
+	uint8_t  	_delay;
 
 };
 

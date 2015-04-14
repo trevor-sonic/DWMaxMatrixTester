@@ -18,7 +18,6 @@
  ****************************************************************************
  */
 
-#include "Arduino.h"
 #include "DWMaxMatrix.h"
 
 DWMaxMatrix::DWMaxMatrix( byte _load, byte _clock, byte _data, byte _num, byte * colBuffer) 

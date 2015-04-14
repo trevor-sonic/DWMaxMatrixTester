@@ -5,12 +5,12 @@
 DotDisplay::DotDisplay(byte load, byte clock, byte data, byte num, byte * colBuffer) : DWMaxMatrix(load,  clock, data,  num, colBuffer)
 
 {
-  _currString="";
-  _lastChar=0;
+  _currString = "";
+  _lastChar = 0;
 
-	_delay		=	100;
-	_lastMillis	=	millis();
-	_running	=	false;
+  _delay		=	100;
+  _lastMillis	=	millis();
+  _running	=	false;
 
 }
 void DotDisplay::setupDisplay( const char *charSet, void(*fptr)(uint8_t, char * ) )
@@ -20,55 +20,75 @@ void DotDisplay::setupDisplay( const char *charSet, void(*fptr)(uint8_t, char * 
   _CharSet            =   charSet;
   _systemTextHandler  =   fptr;
 }
-void DotDisplay::moveLeft()
+
+void DotDisplay::slideLeft()
 {
 
-  /*
-  if (*_currString == 0)
-  {
-    _lastChar   =  0;
-   // _running    =  false;
-    return;
-  } */
-    
-      _currChar  = *_currString;  
-      if (_currChar < 32) return;
-    
-      
-  if(_lastChar  !=  _currChar)
-  {
-
-
-      
-      _colQty    =  _CharSet[ 7 * (_currChar-32) ];
-      _lastChar  = _currChar;
-      _colIndex = 0;
-  }
-  
-  //_currString++;
-
-
-  setColumn(columnQty, _CharSet[ _colIndex + (7 * (_currChar - 32)) ]);
   _colIndex++;
-  // 	writeSprite from 32th column
-  //writeSprite(columnQty, 0, buffer);
+  shiftLeft(false, false);
 
-  //	move cursor to char	with and pur 1 column space
-  //setColumn(columnQty + buffer[0], 0);
-
-  //	Shift left "char with + 1" times
-  //for (int i = 0; i < buffer[0] + 1; i++)
-  //{
-   // delay(shift_speed);
-    shiftLeft(false, false);
-  //}  
-
-  if(_colIndex>=_colQty)
+  if (_colIndex > _colQty + 2)
   {
+    _currCharIndex++;
     _currString++;
+    getChar();
   }
 }
-void DotDisplay::printStringWithShift(char * s, int shift_speed)
+void DotDisplay::engine()
+{
+
+  if (_running && millis() - _lastMillis >  _delay   )
+  {
+    _lastMillis	=	millis();
+    slideLeft();
+    digitalWrite(3,HIGH);
+  }
+  else
+  {
+  digitalWrite(3,LOW);
+  return;
+  }
+  
+  delay(30);
+  
+}
+void DotDisplay::printShift  (char * s, uint8_t delayMs)
+{
+  _currString     =  s;
+  _currCharIndex  =  0;
+
+  _delay       =  delayMs;
+  _running     =  true;
+  _lastMillis  =  millis();
+
+  getChar();
+}
+void DotDisplay::getChar()
+{
+  _currChar       =  *_currString;
+  if (_currChar != 0)
+  {}
+  else
+  {
+    _running = false;
+    return;
+  }
+  if (_currChar < 32) return;
+
+  memcpy_P(buffer, _CharSet + 7 * (_currChar - 32), 7);
+
+  //writeSprite in out of range
+  writeSprite(columnQty, 0, buffer);
+
+  //	move cursor to char	with and pur 1 column space
+  setColumn(columnQty + buffer[0], 0);
+
+
+  _colQty      =  buffer[0];
+  _colIndex    =  2;
+
+}
+void DotDisplay::printStringWithShift(char * s, uint8_t shift_speed)
 {
   while (*s != 0)
   {
@@ -76,27 +96,10 @@ void DotDisplay::printStringWithShift(char * s, int shift_speed)
     s++;
   }
 }
-void DotDisplay::engine()
-{
-    if ( _running && (millis() >= _lastMillis + _delay) )
-    {
-    	_lastMillis	=	millis();
-        moveLeft();
-    }
-}
-void DotDisplay::printShift  (char * s, int delayMs)
-{
-    _currString  =  s;
-    _delay       =  delayMs;
-    _running     =  true;
-    _lastMillis  =  millis();
-}
-void DotDisplay::printCharWithShift(char c, int shift_speed)
+void DotDisplay::printCharWithShift(char c, uint8_t shift_speed)
 {
   // unknown char, do nothing!
   if (c < 32) return;
-
-
 
   // offset of char in array
   c -= 32;
@@ -122,7 +125,7 @@ void DotDisplay::printCharWithShift(char c, int shift_speed)
 
   //	for "A"
   //	_CharSet (pointer) + 7 * 33 = 231
- 
+
   // 	memcpy_P into buffer from 231,   7 bytes
   memcpy_P(buffer, _CharSet + 7 * c, 7);
 
@@ -135,10 +138,10 @@ void DotDisplay::printCharWithShift(char c, int shift_speed)
   //	Shift left "char with + 1" times
   for (int i = 0; i < buffer[0] + 1; i++)
   {
-   delay(shift_speed);
+    delay(shift_speed);
     shiftLeft(false, false);
   }
-  
+
 }
 void DotDisplay::printString(char *s)
 {
@@ -197,7 +200,7 @@ void DotDisplay::printStrInt2(String s, int i, String s2, int i2)
   clear();
   printString(_charBuf);
 }
-void DotDisplay::printStringWithShift2(String s, int shift_speed)
+void DotDisplay::printStringWithShift2(String s, uint8_t shift_speed)
 {
   String str  =  "";
   str += s;
@@ -262,17 +265,4 @@ void DotDisplay::moveDown(uint8_t move)
     shiftDown(true);
     delay(25);
   }
-}
-void DotDisplay::printNumbers(String s, uint8_t *arr, uint8_t len, uint8_t speed)
-{
-
-  for (uint8_t i = 0 ; i < len; i++)
-  {
-    s += String(arr[i], DEC);
-    s += ", ";
-  }
-
-  //    char cBuf[4];
-  s.toCharArray(_charBuf, 4);
-  printStringWithShift( _charBuf  , speed);
 }

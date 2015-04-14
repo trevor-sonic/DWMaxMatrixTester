@@ -22,6 +22,8 @@
 #define _DWMaxMatrix_H_
 
 #include "Arduino.h"
+#include "avr/pgmspace.h"
+
 
 #define max7219_reg_noop        0x00
 #define max7219_reg_digit0      0x01

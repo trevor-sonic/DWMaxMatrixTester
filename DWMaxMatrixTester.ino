@@ -9,9 +9,10 @@
  *
  ****************************************************************************
  */
+#include "DotDisplay.h"
 #include "CharDefinitions.h"
-#include "MaxMatrix.h"
-#include "avr/pgmspace.h"
+#include "DWEasyInterval.h"
+
 
 
 #define load  11  // CS  pin of MAX7219 module
@@ -23,41 +24,39 @@ byte colBuffer[ 16 + displayQty * 8];
 
 // Instance of module
 DotDisplay m(load, clock, data, displayQty, colBuffer);
+DWEasyInterval interval;
 
 void setup()
 {
-//Serial.begin(9600);
-//Serial.println('Start.');
-//delay(100);
-	m.setupDisplay          (CharSet, &systemTextHandler);
-	//m.printString  ("Test");
-	//m.printStringWithShift("1234567890\0", 80);
+  //Serial.begin(9600);
+  //Serial.print('Start.');
+  delay(100);
+  pinMode(3, OUTPUT);
+  pinMode(5, OUTPUT);
 
-        m.printShift("1234567890\0", 500);
-//test();          
+
+  m.setupDisplay          (CharSet, &systemTextHandler);
+  m.printShift("abc!.123", 100);
+
+interval.setFunction(refresh);
+interval.setDelay(500,0);
+//interval.start();
+
 }
-void test()
-{
-  m.setColumn(8,CharSet[ 2 + 7 * 16 ]);
-  m.shiftLeft(false,false);
 
-  m.setColumn(8,CharSet[ 3 + 7 * 16 ]);
-  m.shiftLeft(false,false);  
-  
-  m.setColumn(8,CharSet[ 4 + 7 * 16 ]);
-  m.shiftLeft(false,false);
-
-  m.setColumn(8,CharSet[ 5 + 7 * 16 ]);
-  m.shiftLeft(false,false);  
-}
 void loop()
 {
-  m.engine();
+ m.engine();
+//interval.loop();
+}
+void refresh()
+{
+   m.slideLeft();
 }
 void systemTextHandler(uint8_t txtID, char *bf)
 {
-//	strcpy_P(bf, (char *) pgm_read_word ( &(SysTexts[txtID]) ) );
-//    myDisplay.printStringWithShift(bf, 50);
+  //	strcpy_P(bf, (char *) pgm_read_word ( &(SysTexts[txtID]) ) );
+  //    myDisplay.printStringWithShift(bf, 50);
 }
 
 
