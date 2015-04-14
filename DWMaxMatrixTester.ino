@@ -28,36 +28,31 @@ DWEasyInterval interval;
 
 void setup()
 {
-  //Serial.begin(9600);
-  //Serial.print('Start.');
-  delay(100);
+  Serial.begin(9600);
+  Serial.print('Start.');
+
+
+
   pinMode(3, OUTPUT);
   pinMode(5, OUTPUT);
 
 
-  m.setupDisplay          (CharSet, &systemTextHandler);
-  m.printShift("abc!.123", 100);
+  m.setupDisplay          (CharSet);
+  m.printShift("abc!.123", 90);
 
 interval.setFunction(refresh);
 interval.setDelay(500,0);
-//interval.start();
+interval.start();
 
 }
 
 void loop()
 {
- m.engine();
-//interval.loop();
+  m.engine();
+  interval.loop();
 }
 void refresh()
 {
-   m.slideLeft();
+  Serial.println(millis(), DEC); 
 }
-void systemTextHandler(uint8_t txtID, char *bf)
-{
-  //	strcpy_P(bf, (char *) pgm_read_word ( &(SysTexts[txtID]) ) );
-  //    myDisplay.printStringWithShift(bf, 50);
-}
-
-
 

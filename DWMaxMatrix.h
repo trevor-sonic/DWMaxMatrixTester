@@ -48,7 +48,7 @@ class DWMaxMatrix
     byte clock;
     byte num;
     byte * buffer;
-
+    byte             _bufferColQty;
     void reload();
 
   public:
