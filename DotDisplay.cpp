@@ -1,21 +1,19 @@
 // Library header
 #include "DotDisplay.h"
 
-#define writeModeString  0
-#define writeModeText    1
+
 
 // Code
 DotDisplay::DotDisplay(byte load, byte clock, byte data, byte num, byte * colBuffer) : DWMaxMatrix(load,  clock, data,  num, colBuffer)
 
 {
   _currString  =  "";
-  _lastChar    =  0;
   _charLength  =  0;
   _delay       =  100;
   _lastMillis  =  millis();
   _running     =  false;
   _currWriteMode= writeModeString;
-
+  _slideDirection=slideDirectionLeft;
 }
 void DotDisplay::setupDisplay( const char *charSet)
 {
@@ -30,7 +28,7 @@ void DotDisplay::engine()
   if (_running && millis() > _lastMillis +  _delay   )
   {
     _lastMillis	=	millis();
-    slideLeft();
+    slide();
   }
 
 }
@@ -49,15 +47,9 @@ void DotDisplay::textShift (const char *txt, uint8_t delayMs, functionPointer th
   
   _callBackFunction=theFunction;
   _delay       =  delayMs;
-  //------
-  unsigned long t1= micros(); 
+
   _charLength  =  getTxtLen(_currText);
-  unsigned long t2= micros(); 
-  Serial.print("uS:"); 
-  Serial.println(t2 - t1, DEC);  
-  Serial.print("LEN:");   
-  Serial.println(_charLength, DEC); 
- //------   
+
   startShift();  
 }
 void DotDisplay::stringShift  (char * s, uint8_t delayMs, functionPointer theFunction)
@@ -67,15 +59,9 @@ void DotDisplay::stringShift  (char * s, uint8_t delayMs, functionPointer theFun
   
   _callBackFunction=theFunction;
   _delay       =  delayMs;
-  //------
-  unsigned long t1= micros(); 
+
   _charLength  =  getStrLen(_currString);
-  unsigned long t2= micros(); 
-  Serial.print("uS:"); 
-  Serial.println(t2 - t1, DEC);  
-  Serial.print("LEN:");   
-  Serial.println(_charLength, DEC); 
- //------ 
+
   startShift();
 }
 void DotDisplay::getChar()
@@ -113,11 +99,18 @@ void DotDisplay::getChar()
   _colIndex    =  2;
 
 }
-void DotDisplay::slideLeft()
+void DotDisplay::slide()
 {
 
   _colIndex++;
-  shiftLeft(false, false);
+  if(_slideDirection == slideDirectionLeft)
+  {
+    shiftLeft(false, false);
+  }
+  else if(_slideDirection == slideDirectionRight)
+  {
+    shiftRight(false, false);
+  }
 
   if (_colIndex > _colQty + 2)
   {
@@ -173,4 +166,14 @@ uint8_t DotDisplay::getCharIndex()
 byte DotDisplay::getLength()
 {
   return _charLength;
+}
+byte DotDisplay::getDelay()
+{
+  return _delay;
+}
+void DotDisplay::setDirection(byte d)
+{
+  _slideDirection  =  d;
+  Serial.print("_slideDirection");
+  Serial.println(_slideDirection, DEC);
 }

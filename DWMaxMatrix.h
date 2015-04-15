@@ -54,6 +54,7 @@ class DWMaxMatrix
   public:
     DWMaxMatrix(byte load, byte clock, byte data,  byte num, byte * colBuffer);
 
+    byte getStrLen( byte *s );
     void init();
     void clear();
     void setCommand(byte command, byte value);

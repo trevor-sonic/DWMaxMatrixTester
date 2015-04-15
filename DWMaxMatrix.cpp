@@ -27,7 +27,6 @@ DWMaxMatrix::DWMaxMatrix( byte _load, byte _clock, byte _data, byte _num, byte *
   clock = _clock;
   num = _num;
   buffer  =  colBuffer;
-
   _bufferColQty  =  16 + _num * 8;
 
   for (int i = 0; i < _bufferColQty; i++)
@@ -186,9 +185,19 @@ void DWMaxMatrix::shiftLeft(bool rotate, bool fill_zero)
   byte old = buffer[0];
   int i;
   for (i = 0; i < _bufferColQty; i++)
+  {
     buffer[i] = buffer[i + 1];
-  if (rotate) buffer[num * 8 - 1] = old;
-  else if (fill_zero) buffer[num * 8 - 1] = 0;
+  }
+  
+  // re-feed array options 
+  if (rotate)
+  {
+    buffer[num * 8 - 1] = old;
+  }
+  else if (fill_zero)
+  {
+    buffer[num * 8 - 1] = 0;
+  }
 
   reload();
 }
@@ -199,9 +208,19 @@ void DWMaxMatrix::shiftRight(bool rotate, bool fill_zero)
   byte old = buffer[last];
   int i;
   for (i = (_bufferColQty - 1) ; i > 0; i--)
+  {
     buffer[i] = buffer[i - 1];
-  if (rotate) buffer[0] = old;
-  else if (fill_zero) buffer[0] = 0;
+  }
+  
+  // re-feed array options 
+  if (rotate)
+  {
+    buffer[0] = old;
+  }
+  else if (fill_zero)
+  {
+    buffer[0] = 0;
+  }
 
   reload();
 }

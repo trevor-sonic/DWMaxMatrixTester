@@ -8,8 +8,12 @@
 #define displayQty              1
 #define mainBufferSize          80
 //Defs
-#define columnQty   (displayQty*8)
-
+#define columnQty               (displayQty*8)
+#define colBufferQty            (columnQty + 16)  //1 empty virtual display buffer on the left and right
+#define writeModeString  0
+#define writeModeText    1
+#define slideDirectionLeft        0
+#define slideDirectionRight       1
 
 //#include "Arduino.h"
 //-----------------------------------------------
@@ -28,24 +32,26 @@ public:
 
 	void setCharSet             (const char *cs);
         void setDelay               (uint8_t delayMs);
+        byte getDelay               ();
+        
         uint8_t getCharIndex        ();
         byte                        getLength();  
         
 	void printString            (char *s);
 
-        void stringShift            (char * s, uint8_t delayMs, functionPointer theFunction);
-        void textShift              (const char *txt, uint8_t delayMs, functionPointer theFunction);
+        void  stringShift            (char * s, uint8_t delayMs, functionPointer theFunction);
+        void  textShift              (const char *txt, uint8_t delayMs, functionPointer theFunction);
+        void  setDirection           (byte d);
         
-        void                       slideLeft();
         
         
         
 private:
-        byte              _colIndex;
+        byte             _colIndex;
         byte             _colQty;
         char             _currChar;
         byte             _currCharIndex;
-        char             _lastChar;
+
         char              * _currString;
         const char        * _currText;
         byte              _currWriteMode;
@@ -56,7 +62,11 @@ private:
 
         void             getChar();
 
+        byte             _slideDirection;
         void             startShift();
+        void             slide();
+        
+        
         byte             getStrLen( char *s );
         byte             getTxtLen( const char *t );
         

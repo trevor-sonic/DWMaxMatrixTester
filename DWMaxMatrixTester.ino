@@ -21,7 +21,7 @@
 #define data  13  // DIN pin of MAX7219 module
 #define displayQty  1  // Display quantity
 // Dots buffer ** do not modify below 
-byte colBuffer[ 16 + displayQty * 8];
+byte colBuffer[ colBufferQty ];
 
 // Instance of module
 DotDisplay m(load, clock, data, displayQty, colBuffer);
@@ -30,7 +30,7 @@ DWEasyInterval interval;
 void setup()
 {
   Serial.begin(9600);
-  Serial.println('Start.');
+  Serial.println("Start.");
 
 
 
@@ -39,11 +39,11 @@ void setup()
 
 
   m.setupDisplay          (CharSet);
-  m.stringShift("0123456789", 20, printEnd);
+  //m.textShift(TEXT01, 100, printEnd);
+  m.stringShift("123456", 100, printEnd);
   
-  
-  interval.setFunction(changeDelay);
-  interval.setDelay(10, 0);
+  interval.setFunction(changeDir);
+  interval.setDelay(1900, 0);
   interval.start();
 
 }
@@ -53,15 +53,16 @@ void loop()
   m.engine();
   interval.loop();
 }
-void changeDelay()
+void changeDir()
 {
-  //m.setDelay( 100 * (30 / m.getCharIndex() ) );
+  delay(1000);
+  m.setDirection(slideDirectionRight);
 }
 void printEnd()
 {
-  Serial.println("-> printEnd");
-  Serial.print("char len was:");
-  Serial.println(m.getLength(), DEC);
-
-  m.textShift(TEXT03, 20, printEnd);
+//  Serial.println("-> printEnd");
+//  Serial.print("char len was:");
+//  Serial.println(m.getLength(), DEC);
+  //m.stringShift("0123456789", 20, printEnd);
+  
 }
