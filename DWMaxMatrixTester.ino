@@ -20,7 +20,7 @@
 #define clock 12  // CLK pin of MAX7219 module
 #define data  13  // DIN pin of MAX7219 module
 #define displayQty  1  // Display quantity
-// Dots buffer
+// Dots buffer ** do not modify below 
 byte colBuffer[ 16 + displayQty * 8];
 
 // Instance of module
@@ -39,7 +39,8 @@ void setup()
 
 
   m.setupDisplay          (CharSet);
-  m.stringShift("This is test text! 0123456789ABCDEF ", 50, printEnd);
+  m.stringShift("0123456789", 20, printEnd);
+  
   
   interval.setFunction(changeDelay);
   interval.setDelay(10, 0);
@@ -59,5 +60,8 @@ void changeDelay()
 void printEnd()
 {
   Serial.println("-> printEnd");
-  m.textShift(TEXT02, 50, printEnd);
+  Serial.print("char len was:");
+  Serial.println(m.getLength(), DEC);
+
+  m.textShift(TEXT03, 20, printEnd);
 }

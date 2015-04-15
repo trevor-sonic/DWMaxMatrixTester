@@ -29,8 +29,10 @@ public:
 	void setCharSet             (const char *cs);
         void setDelay               (uint8_t delayMs);
         uint8_t getCharIndex        ();
+        byte                        getLength();  
         
 	void printString            (char *s);
+
         void stringShift            (char * s, uint8_t delayMs, functionPointer theFunction);
         void textShift              (const char *txt, uint8_t delayMs, functionPointer theFunction);
         
@@ -48,12 +50,16 @@ private:
         const char        * _currText;
         byte              _currWriteMode;
         
+        byte             _charLength;
+        
         void             charShift(char  c);
 
         void             getChar();
 
         void             startShift();
-
+        byte             getStrLen( char *s );
+        byte             getTxtLen( const char *t );
+        
 	byte                buffer[8];// 1 char is 8 bytes.
 	int                 diplayOffset;
 	char                _charBuf            [chBufferSize];
