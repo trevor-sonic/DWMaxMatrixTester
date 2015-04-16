@@ -27,7 +27,7 @@ DWMaxMatrix::DWMaxMatrix( byte _load, byte _clock, byte _data, byte _num, byte *
   clock = _clock;
   num = _num;
   buffer  =  colBuffer;
-  _bufferColQty  =  16 + _num * 8;
+  _bufferColQty  =  8 + _num * 8;
 
   for (int i = 0; i < _bufferColQty; i++)
   {
@@ -146,21 +146,31 @@ void DWMaxMatrix::writeSprite(int x, int y, const byte * sprite)
   int h = sprite[1];
 
   if (h == 8 && y == 0)
+  {
     for (int i = 0; i < w; i++)
     {
       int c = x + i;
       if (c >= 0 && c < _bufferColQty)
+      {
         setColumn(c, sprite[i + 2]);
+      }
     }
+  }
   else
+  {
     for (int i = 0; i < w; i++)
+    {
       for (int j = 0; j < h; j++)
       {
         int c = x + i;
         int r = y + j;
         if (c >= 0 && c < _bufferColQty && r >= 0 && r < 8)
+        {
           setDot(c, r, bitRead(sprite[i + 2], j));
+        }
       }
+    }
+  }
 }
 
 void DWMaxMatrix::reload()
@@ -189,7 +199,16 @@ void DWMaxMatrix::shiftLeft(bool rotate, bool fill_zero)
     buffer[i] = buffer[i + 1];
   }
   
-  // re-feed array options 
+  // Shift leftBuffer
+  for (i = 0; i < 7; i++)
+  {
+    leftBuffer[i] = leftBuffer[i + 1];
+  }
+  //Add lost coloumn from main buffer to leftBuffer
+  leftBuffer[7]  =  old;
+  
+  
+  // re-feed array options
   if (rotate)
   {
     buffer[num * 8 - 1] = old;
@@ -212,7 +231,16 @@ void DWMaxMatrix::shiftRight(bool rotate, bool fill_zero)
     buffer[i] = buffer[i - 1];
   }
   
-  // re-feed array options 
+  //Add invisible coloumn from leftBuffer to main buffer
+  buffer[0]  =  leftBuffer[7] ;
+  
+  // Shift leftBuffer
+  for (i = 7; i > 0 ; i--)
+  {
+    leftBuffer[i] = leftBuffer[i - 1];
+  }  
+  
+  // re-feed array options
   if (rotate)
   {
     buffer[0] = old;

@@ -4,7 +4,8 @@
 
 
 // Code
-DotDisplay::DotDisplay(byte load, byte clock, byte data, byte num, byte * colBuffer) : DWMaxMatrix(load,  clock, data,  num, colBuffer)
+DotDisplay::DotDisplay(byte load, byte clock, byte data, byte num, byte * colBuffer) 
+            :DWMaxMatrix(load,  clock, data,  num, colBuffer)
 
 {
   _currString  =  "";
@@ -37,7 +38,7 @@ void DotDisplay::startShift()
   _currCharIndex  =  0;
   _running     =  true;
   _lastMillis  =  millis();
-
+   
   getChar();  
 }
 void DotDisplay::textShift (const char *txt, uint8_t delayMs, functionPointer theFunction)
@@ -75,49 +76,62 @@ void DotDisplay::getChar()
   {
     _currChar       =  pgm_read_byte_near(_currText + _currCharIndex);
   }
-//    Serial.print(_currCharIndex, DEC);
-//    Serial.print(":");
-//    Serial.println(_currChar);
   if (_currChar == 0)
   {
-    //Serial.println("*END*");
     _running = false;
     if(_callBackFunction)_callBackFunction();
   }
   if (_currChar < 32) return;
 
-  memcpy_P(buffer, _CharSet + 7 * (_currChar - 32), 7);
+  memcpy_P(temp, _CharSet + 7 * (_currChar - 32), 7);
 
-  //writeSprite in out of range
-  writeSprite(columnQty, 0, buffer);
-
-  //	move cursor to char	with and pur 1 column space
-  setColumn(columnQty + buffer[0], 0);
-
-
-  _colQty      =  buffer[0];
+  _colQty      =  temp[0];
   _colIndex    =  2;
+  
+  
+  byte startColumnFrom  =  (num*8);
+  
+  // writeSprite in out of range
+  writeSprite(startColumnFrom, 0, temp);
 
+  // move cursor to char	with and pur 1 column space
+  setColumn(startColumnFrom + _colQty , 0);
 }
 void DotDisplay::slide()
 {
-
-  _colIndex++;
   if(_slideDirection == slideDirectionLeft)
   {
-    shiftLeft(false, false);
+    slideLeft();
   }
   else if(_slideDirection == slideDirectionRight)
   {
-    shiftRight(false, false);
+    slideRight();
   }
+}
+void DotDisplay::slideLeft()
+{
+  _colIndex++;
+  shiftLeft(false, false);
 
   if (_colIndex > _colQty + 2)
   {
     _currCharIndex++;
     _currString++;
     getChar();
-  }
+  }  
+}
+void DotDisplay::slideRight()
+{
+  _colIndex--;
+  shiftRight(false, false);
+  
+  if (_colIndex < _colQty + 2)
+  {
+    _currCharIndex--;
+    _currString--;
+    getChar();
+  }    
+  
 }
 void DotDisplay::printString(char *s)
 {
@@ -126,10 +140,10 @@ void DotDisplay::printString(char *s)
   {
     if (*s < 32) continue;
     char c = *s - 32;
-    memcpy_P(buffer, _CharSet + 7 * c, 7);
-    writeSprite(col, 0, buffer);
-    setColumn(col + buffer[0], 0);
-    col += buffer[0] + 1;
+    memcpy_P(temp, _CharSet + 7 * c, 7);
+    writeSprite(col, 0, temp);
+    setColumn(col + temp[0], 0);
+    col += temp[0] + 1;
     s++;
   }
 }

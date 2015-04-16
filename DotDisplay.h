@@ -3,13 +3,9 @@
 #include "DWMaxMatrix.h"
 #include <avr/pgmspace.h>
 
-//Cfgs
-#define chBufferSize            8
-#define displayQty              1
-#define mainBufferSize          80
-//Defs
+//Definitions
 #define columnQty               (displayQty*8)
-#define colBufferQty            (columnQty + 16)  //1 empty virtual display buffer on the left and right
+#define colBufferQty            (columnQty + 8)  //1 empty virtual display buffer on the  right
 #define writeModeString  0
 #define writeModeText    1
 #define slideDirectionLeft        0
@@ -65,14 +61,16 @@ private:
         byte             _slideDirection;
         void             startShift();
         void             slide();
+        void             slideLeft();
+        void             slideRight();
         
         
         byte             getStrLen( char *s );
         byte             getTxtLen( const char *t );
         
-	byte                buffer[8];// 1 char is 8 bytes.
+	byte                temp[8];// 1 char is 8 bytes.
 	int                 diplayOffset;
-	char                _charBuf            [chBufferSize];
+	
 	const char        * _CharSet;
 	const char        * _texts;
 	const char        * _textLens;

@@ -20,6 +20,7 @@
 #define clock 12  // CLK pin of MAX7219 module
 #define data  13  // DIN pin of MAX7219 module
 #define displayQty  1  // Display quantity
+
 // Dots buffer ** do not modify below 
 byte colBuffer[ colBufferQty ];
 
@@ -40,10 +41,11 @@ void setup()
 
   m.setupDisplay          (CharSet);
   //m.textShift(TEXT01, 100, printEnd);
-  m.stringShift("123456", 100, printEnd);
+
+  m.stringShift("0123456789ABCDEF", 200, printEnd);
   
   interval.setFunction(changeDir);
-  interval.setDelay(1900, 0);
+  interval.setDelay(100, 0);
   interval.start();
 
 }
@@ -55,8 +57,17 @@ void loop()
 }
 void changeDir()
 {
-  delay(1000);
-  m.setDirection(slideDirectionRight);
+  if(m.getCharIndex()>5)
+  {
+    //delay(1000);
+    m.setDirection(slideDirectionRight);
+  }
+  else if(m.getCharIndex()<1)
+  {
+    //delay(1000);
+    m.setDirection(slideDirectionLeft);
+  }
+  
 }
 void printEnd()
 {
