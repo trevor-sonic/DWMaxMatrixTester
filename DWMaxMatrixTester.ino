@@ -42,11 +42,12 @@ void setup()
   m.setupDisplay          (CharSet);
   //m.textShift(TEXT01, 100, printEnd);
 
+  m.setDirection(slideDirectionRight);
   m.stringShift("0123456789ABCDEF", 200, printEnd);
   
   interval.setFunction(changeDir);
   interval.setDelay(100, 0);
-  interval.start();
+  //interval.start();
 
 }
 
@@ -71,9 +72,9 @@ void changeDir()
 }
 void printEnd()
 {
-//  Serial.println("-> printEnd");
-//  Serial.print("char len was:");
-//  Serial.println(m.getLength(), DEC);
+  Serial.println("-> printEnd");
+  Serial.print("char len was:");
+  Serial.println(m.getLength(), DEC);
   //m.stringShift("0123456789", 20, printEnd);
   
 }

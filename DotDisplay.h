@@ -43,8 +43,8 @@ public:
         
         
 private:
-        byte             _colIndex;
-        byte             _colQty;
+        byte             _charArrIndex;
+        byte             _charColQty;
         char             _currChar;
         byte             _currCharIndex;
 
@@ -57,6 +57,7 @@ private:
         void             charShift(char  c);
 
         void             getChar();
+        void             insertCharColIntoBuffer();
 
         byte             _slideDirection;
         void             startShift();
@@ -68,7 +69,7 @@ private:
         byte             getStrLen( char *s );
         byte             getTxtLen( const char *t );
         
-	byte                temp[8];// 1 char is 8 bytes.
+	byte                _temp[8];// 1 char is 8 bytes.
 	int                 diplayOffset;
 	
 	const char        * _CharSet;

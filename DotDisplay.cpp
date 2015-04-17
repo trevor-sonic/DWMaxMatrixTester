@@ -4,8 +4,8 @@
 
 
 // Code
-DotDisplay::DotDisplay(byte load, byte clock, byte data, byte num, byte * colBuffer) 
-            :DWMaxMatrix(load,  clock, data,  num, colBuffer)
+DotDisplay::DotDisplay(byte load, byte clock, byte data, byte num, byte * colBuffer)
+  : DWMaxMatrix(load,  clock, data,  num, colBuffer)
 
 {
   _currString  =  "";
@@ -13,8 +13,8 @@ DotDisplay::DotDisplay(byte load, byte clock, byte data, byte num, byte * colBuf
   _delay       =  100;
   _lastMillis  =  millis();
   _running     =  false;
-  _currWriteMode= writeModeString;
-  _slideDirection=slideDirectionLeft;
+  _currWriteMode = writeModeString;
+  _slideDirection = slideDirectionLeft;
 }
 void DotDisplay::setupDisplay( const char *charSet)
 {
@@ -35,30 +35,37 @@ void DotDisplay::engine()
 }
 void DotDisplay::startShift()
 {
-  _currCharIndex  =  0;
+  if (_slideDirection == slideDirectionLeft)
+  {  
+    _currCharIndex  =  0;
+  }
+  else if (_slideDirection == slideDirectionRight)
+  {
+    _currCharIndex  =  _charLength;
+  }
   _running     =  true;
   _lastMillis  =  millis();
-   
-  getChar();  
+
+  getChar();
 }
 void DotDisplay::textShift (const char *txt, uint8_t delayMs, functionPointer theFunction)
 {
   _currWriteMode  =  writeModeText;
   _currText       =  txt;
-  
-  _callBackFunction=theFunction;
+
+  _callBackFunction = theFunction;
   _delay       =  delayMs;
 
   _charLength  =  getTxtLen(_currText);
 
-  startShift();  
+  startShift();
 }
 void DotDisplay::stringShift  (char * s, uint8_t delayMs, functionPointer theFunction)
 {
   _currWriteMode  =  writeModeString;
   _currString     =  s;
-  
-  _callBackFunction=theFunction;
+
+  _callBackFunction = theFunction;
   _delay       =  delayMs;
 
   _charLength  =  getStrLen(_currString);
@@ -68,70 +75,123 @@ void DotDisplay::stringShift  (char * s, uint8_t delayMs, functionPointer theFun
 void DotDisplay::getChar()
 {
 
-  if(_currWriteMode  ==  writeModeString)
+Serial.print("_currCharIndex:");
+Serial.println(_currCharIndex);
+
+  if (_currWriteMode  ==  writeModeString)
   {
+    //CORRECTION NEED!!!
     _currChar       =  *_currString;
+    //memcpy( _currChar  , _currString   , 1);
+    
+    //_currChar  =  pgm_read_byte_near(_currString + _currCharIndex);
+    //char *c =_currChar;
+    //memcpy( *_currChar  , _currString   , 1);
   }
-  else if(_currWriteMode  ==  writeModeText)
+  else if (_currWriteMode  ==  writeModeText)
   {
     _currChar       =  pgm_read_byte_near(_currText + _currCharIndex);
   }
   if (_currChar == 0)
   {
     _running = false;
-    if(_callBackFunction)_callBackFunction();
+    if (_callBackFunction)_callBackFunction();
   }
+
+Serial.print("_currChar:");  
+Serial.println(_currChar);
+
   if (_currChar < 32) return;
 
-  memcpy_P(temp, _CharSet + 7 * (_currChar - 32), 7);
+  memcpy_P(_temp, _CharSet + 7 * (_currChar - 32), 7);
 
-  _colQty      =  temp[0];
-  _colIndex    =  2;
-  
-  
-  byte startColumnFrom  =  (num*8);
-  
-  // writeSprite in out of range
-  writeSprite(startColumnFrom, 0, temp);
+  _charColQty      =  _temp[0];
+  _charArrIndex    =  2;
 
-  // move cursor to char	with and pur 1 column space
-  setColumn(startColumnFrom + _colQty , 0);
+  insertCharColIntoBuffer();
+
+}
+void DotDisplay::insertCharColIntoBuffer()
+{
+  if (_slideDirection == slideDirectionLeft)
+  {
+    byte startColumnFrom  =  (num * 8);
+  
+    // writeSprite in out of range
+    writeSprite(startColumnFrom, 0, _temp);
+  
+    // move cursor to char	with and pur 1 column space
+    setColumn(startColumnFrom + _charColQty , 0);
+  }
+  else if (_slideDirection == slideDirectionRight)
+  {
+    byte startColumnFrom  =  7 - _charColQty;
+
+    memcpy( _leftBuffer + startColumnFrom  , _temp + _charArrIndex   , _charColQty);
+    
+    //DEBUGER vvvvvvvvvvv
+     for(byte i=0; i<7; i++)
+    {
+        if (_temp[i]<128) Serial.print('0');
+        if (_temp[i]<64) Serial.print('0');
+        if (_temp[i]<32) Serial.print('0');
+        if (_temp[i]<16) Serial.print('0');
+        if (_temp[i]<8) Serial.print('0');
+        if (_temp[i]<4) Serial.print('0');
+        if (_temp[i]<2) Serial.print('0');
+      Serial.println(_temp[i], BIN);
+    }
+    Serial.println("------------");
+    for(byte i=0; i<8; i++)
+    {
+        if (_leftBuffer[i]<128) Serial.print('0');
+        if (_leftBuffer[i]<64) Serial.print('0');
+        if (_leftBuffer[i]<32) Serial.print('0');
+        if (_leftBuffer[i]<16) Serial.print('0');
+        if (_leftBuffer[i]<8) Serial.print('0');
+        if (_leftBuffer[i]<4) Serial.print('0');
+        if (_leftBuffer[i]<2) Serial.print('0');
+      Serial.println(_leftBuffer[i], BIN);
+    }
+    
+    //^^^^^^^^^^^^^^^^^^^
+  }
 }
 void DotDisplay::slide()
 {
-  if(_slideDirection == slideDirectionLeft)
+  if (_slideDirection == slideDirectionLeft)
   {
     slideLeft();
   }
-  else if(_slideDirection == slideDirectionRight)
+  else if (_slideDirection == slideDirectionRight)
   {
     slideRight();
   }
 }
 void DotDisplay::slideLeft()
 {
-  _colIndex++;
+  _charArrIndex++;
   shiftLeft(false, false);
 
-  if (_colIndex > _colQty + 2)
+  if (_charArrIndex > _charColQty + 2)
   {
     _currCharIndex++;
     _currString++;
     getChar();
-  }  
+  }
 }
 void DotDisplay::slideRight()
 {
-  _colIndex--;
+  _charArrIndex++;
   shiftRight(false, false);
-  
-  if (_colIndex < _colQty + 2)
+
+  if (_charArrIndex > _charColQty + 2)
   {
     _currCharIndex--;
     _currString--;
     getChar();
-  }    
-  
+  }
+
 }
 void DotDisplay::printString(char *s)
 {
@@ -140,17 +200,17 @@ void DotDisplay::printString(char *s)
   {
     if (*s < 32) continue;
     char c = *s - 32;
-    memcpy_P(temp, _CharSet + 7 * c, 7);
-    writeSprite(col, 0, temp);
-    setColumn(col + temp[0], 0);
-    col += temp[0] + 1;
+    memcpy_P(_temp, _CharSet + 7 * c, 7);
+    writeSprite(col, 0, _temp);
+    setColumn(col + _temp[0], 0);
+    col += _temp[0] + 1;
     s++;
   }
 }
 byte DotDisplay::getStrLen( char *s )
 {
   byte cnt = 0;
-  while(*s != 0)
+  while (*s != 0)
   {
     cnt++;
     s++;
@@ -161,8 +221,8 @@ byte DotDisplay::getTxtLen( const char *t )
 {
   byte cnt =  0;
   char c   =  pgm_read_byte_near(t + cnt);
-  
-  while(c != 0)
+
+  while (c != 0)
   {
     cnt++;
     c   =  pgm_read_byte_near(t + cnt);
@@ -188,6 +248,6 @@ byte DotDisplay::getDelay()
 void DotDisplay::setDirection(byte d)
 {
   _slideDirection  =  d;
-  Serial.print("_slideDirection");
+  Serial.print("_slideDirection is set to:");
   Serial.println(_slideDirection, DEC);
 }

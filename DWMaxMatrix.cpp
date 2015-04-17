@@ -199,13 +199,13 @@ void DWMaxMatrix::shiftLeft(bool rotate, bool fill_zero)
     buffer[i] = buffer[i + 1];
   }
   
-  // Shift leftBuffer
+  // Shift _leftBuffer
   for (i = 0; i < 7; i++)
   {
-    leftBuffer[i] = leftBuffer[i + 1];
+    _leftBuffer[i] = _leftBuffer[i + 1];
   }
-  //Add lost coloumn from main buffer to leftBuffer
-  leftBuffer[7]  =  old;
+  //Add lost coloumn from main buffer to _leftBuffer
+  _leftBuffer[7]  =  old;
   
   
   // re-feed array options
@@ -231,13 +231,13 @@ void DWMaxMatrix::shiftRight(bool rotate, bool fill_zero)
     buffer[i] = buffer[i - 1];
   }
   
-  //Add invisible coloumn from leftBuffer to main buffer
-  buffer[0]  =  leftBuffer[7] ;
+  //Add invisible coloumn from _leftBuffer to main buffer
+  buffer[0]  =  _leftBuffer[7] ;
   
-  // Shift leftBuffer
+  // Shift _leftBuffer
   for (i = 7; i > 0 ; i--)
   {
-    leftBuffer[i] = leftBuffer[i - 1];
+    _leftBuffer[i] = _leftBuffer[i - 1];
   }  
   
   // re-feed array options

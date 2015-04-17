@@ -44,14 +44,16 @@ class DWMaxMatrix
 {
   protected:
     byte num;
-  
+    byte _leftBuffer[8];
+    
+    
   private:
     byte data;
     byte load;
     byte clock;
     
     byte * buffer;
-    byte leftBuffer[8];
+    
     byte             _bufferColQty;
     void reload();
 
