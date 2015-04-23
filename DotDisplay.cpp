@@ -41,7 +41,7 @@ void DotDisplay::startShift()
   }
   else if (_slideDirection == slideDirectionRight)
   {
-    _currCharIndex  =  _charLength;
+    _currCharIndex  =  _charLength - 1;
   }
   _running     =  true;
   _lastMillis  =  millis();
@@ -74,34 +74,26 @@ void DotDisplay::stringShift  (char * s, uint8_t delayMs, functionPointer theFun
 }
 void DotDisplay::getChar()
 {
-
-Serial.print("_currCharIndex:");
-Serial.println(_currCharIndex);
-
   if (_currWriteMode  ==  writeModeString)
   {
-    //CORRECTION NEED!!!
-    _currChar       =  *_currString;
-    //memcpy( _currChar  , _currString   , 1);
-    
-    //_currChar  =  pgm_read_byte_near(_currString + _currCharIndex);
-    //char *c =_currChar;
-    //memcpy( *_currChar  , _currString   , 1);
+    _currChar      =  _currString[_currCharIndex];
   }
   else if (_currWriteMode  ==  writeModeText)
   {
     _currChar       =  pgm_read_byte_near(_currText + _currCharIndex);
   }
-  if (_currChar == 0)
-  {
-    _running = false;
-    if (_callBackFunction)_callBackFunction();
-  }
+  if (_currChar < 32) return;
+  
+  
 
+  
+Serial.print("_currCharIndex:");
+Serial.println(_currCharIndex);
 Serial.print("_currChar:");  
 Serial.println(_currChar);
 
-  if (_currChar < 32) return;
+
+  
 
   memcpy_P(_temp, _CharSet + 7 * (_currChar - 32), 7);
 
@@ -109,7 +101,25 @@ Serial.println(_currChar);
   _charArrIndex    =  2;
 
   insertCharColIntoBuffer();
+  
+  if (isLastChar())
+  {
+    _running = false;
+    if (_callBackFunction)_callBackFunction();
+  }  
 
+}
+bool DotDisplay::isLastChar()
+{
+  if (_slideDirection == slideDirectionLeft && _currCharIndex == _charLength)
+  {
+    return true;
+  }
+  else if(_slideDirection == slideDirectionRight && _currCharIndex == 0)
+  {
+    return true;
+  }
+  return false;
 }
 void DotDisplay::insertCharColIntoBuffer()
 {
@@ -130,29 +140,29 @@ void DotDisplay::insertCharColIntoBuffer()
     memcpy( _leftBuffer + startColumnFrom  , _temp + _charArrIndex   , _charColQty);
     
     //DEBUGER vvvvvvvvvvv
-     for(byte i=0; i<7; i++)
-    {
-        if (_temp[i]<128) Serial.print('0');
-        if (_temp[i]<64) Serial.print('0');
-        if (_temp[i]<32) Serial.print('0');
-        if (_temp[i]<16) Serial.print('0');
-        if (_temp[i]<8) Serial.print('0');
-        if (_temp[i]<4) Serial.print('0');
-        if (_temp[i]<2) Serial.print('0');
-      Serial.println(_temp[i], BIN);
-    }
-    Serial.println("------------");
-    for(byte i=0; i<8; i++)
-    {
-        if (_leftBuffer[i]<128) Serial.print('0');
-        if (_leftBuffer[i]<64) Serial.print('0');
-        if (_leftBuffer[i]<32) Serial.print('0');
-        if (_leftBuffer[i]<16) Serial.print('0');
-        if (_leftBuffer[i]<8) Serial.print('0');
-        if (_leftBuffer[i]<4) Serial.print('0');
-        if (_leftBuffer[i]<2) Serial.print('0');
-      Serial.println(_leftBuffer[i], BIN);
-    }
+//     for(byte i=0; i<7; i++)
+//    {
+//        if (_temp[i]<128) Serial.print('0');
+//        if (_temp[i]<64) Serial.print('0');
+//        if (_temp[i]<32) Serial.print('0');
+//        if (_temp[i]<16) Serial.print('0');
+//        if (_temp[i]<8) Serial.print('0');
+//        if (_temp[i]<4) Serial.print('0');
+//        if (_temp[i]<2) Serial.print('0');
+//      Serial.println(_temp[i], BIN);
+//    }
+//    Serial.println("------------");
+//    for(byte i=0; i<8; i++)
+//    {
+//        if (_leftBuffer[i]<128) Serial.print('0');
+//        if (_leftBuffer[i]<64) Serial.print('0');
+//        if (_leftBuffer[i]<32) Serial.print('0');
+//        if (_leftBuffer[i]<16) Serial.print('0');
+//        if (_leftBuffer[i]<8) Serial.print('0');
+//        if (_leftBuffer[i]<4) Serial.print('0');
+//        if (_leftBuffer[i]<2) Serial.print('0');
+//      Serial.println(_leftBuffer[i], BIN);
+//    }
     
     //^^^^^^^^^^^^^^^^^^^
   }
@@ -176,7 +186,6 @@ void DotDisplay::slideLeft()
   if (_charArrIndex > _charColQty + 2)
   {
     _currCharIndex++;
-    _currString++;
     getChar();
   }
 }
@@ -187,8 +196,8 @@ void DotDisplay::slideRight()
 
   if (_charArrIndex > _charColQty + 2)
   {
+    //if(_currCharIndex>0) 
     _currCharIndex--;
-    _currString--;
     getChar();
   }
 

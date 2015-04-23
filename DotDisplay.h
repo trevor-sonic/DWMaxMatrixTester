@@ -43,19 +43,23 @@ public:
         
         
 private:
-        byte             _charArrIndex;
-        byte             _charColQty;
-        char             _currChar;
-        byte             _currCharIndex;
-
         char              * _currString;
         const char        * _currText;
+        byte             _charLength;
+        byte             _charArrIndex;
+        
+        char             _currChar;
+        byte             _charColQty;
+        byte             _currCharIndex;
+        
+
         byte              _currWriteMode;
         
-        byte             _charLength;
+        
         
         void             charShift(char  c);
-
+        bool             isLastChar();
+        
         void             getChar();
         void             insertCharColIntoBuffer();
 

@@ -40,10 +40,10 @@ void setup()
 
 
   m.setupDisplay          (CharSet);
-  //m.textShift(TEXT01, 100, printEnd);
+  m.textShift(TEXT01, 100, printEnd);
 
-  m.setDirection(slideDirectionRight);
-  m.stringShift("0123456789ABCDEF", 200, printEnd);
+  //m.setDirection(slideDirectionRight);
+  m.stringShift("ABCDEF", 80, printEnd);
   
   interval.setFunction(changeDir);
   interval.setDelay(100, 0);
@@ -58,12 +58,12 @@ void loop()
 }
 void changeDir()
 {
-  if(m.getCharIndex()>5)
-  {
-    //delay(1000);
-    m.setDirection(slideDirectionRight);
-  }
-  else if(m.getCharIndex()<1)
+//  if(m.getCharIndex()>10)
+//  {
+//    m.setDirection(slideDirectionRight);
+//  }
+//  else 
+  if(m.getCharIndex()<1)
   {
     //delay(1000);
     m.setDirection(slideDirectionLeft);
