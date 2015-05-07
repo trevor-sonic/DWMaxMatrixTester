@@ -52,6 +52,9 @@ private:
         byte             _charColQty;
         byte             _currCharIndex;
         
+        char             _leftIndex;        //-128 to 127 
+        char             _rightIndex;       //-128 to 127 
+        
 
         byte              _currWriteMode;
         

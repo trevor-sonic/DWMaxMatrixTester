@@ -38,10 +38,12 @@ void DotDisplay::startShift()
   if (_slideDirection == slideDirectionLeft)
   {  
     _currCharIndex  =  0;
+    _leftIndex      =  0;
   }
   else if (_slideDirection == slideDirectionRight)
   {
     _currCharIndex  =  _charLength - 1;
+    _rightIndex     =  _charLength - 1;
   }
   _running     =  true;
   _lastMillis  =  millis();
@@ -82,19 +84,15 @@ void DotDisplay::getChar()
   {
     _currChar       =  pgm_read_byte_near(_currText + _currCharIndex);
   }
+  
+  if (isLastChar())
+  {
+    _running = false;
+    if (_callBackFunction)_callBackFunction();
+  } 
+  
   if (_currChar < 32) return;
   
-  
-
-  
-Serial.print("_currCharIndex:");
-Serial.println(_currCharIndex);
-Serial.print("_currChar:");  
-Serial.println(_currChar);
-
-
-  
-
   memcpy_P(_temp, _CharSet + 7 * (_currChar - 32), 7);
 
   _charColQty      =  _temp[0];
@@ -102,16 +100,12 @@ Serial.println(_currChar);
 
   insertCharColIntoBuffer();
   
-  if (isLastChar())
-  {
-    _running = false;
-    if (_callBackFunction)_callBackFunction();
-  }  
+ 
 
 }
 bool DotDisplay::isLastChar()
 {
-  if (_slideDirection == slideDirectionLeft && _currCharIndex == _charLength)
+  if (_slideDirection == slideDirectionLeft && _currCharIndex >= _charLength)
   {
     return true;
   }

@@ -42,7 +42,7 @@ void setup()
   m.setupDisplay          (CharSet);
   m.textShift(TEXT01, 100, printEnd);
 
-  //m.setDirection(slideDirectionRight);
+  m.setDirection(slideDirectionRight);
   m.stringShift("ABCDEF", 80, printEnd);
   
   interval.setFunction(changeDir);
